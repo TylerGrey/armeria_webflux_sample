@@ -3,7 +3,6 @@ package org.example;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 public class HelloController {
@@ -20,10 +19,10 @@ public class HelloController {
     }
 
     @GetMapping("/callback")
-    Mono<String> callback(
+    void callback(
             @RequestParam("access_token") String accessToken,
             @RequestParam("token_type") String tokenType
     ) {
-        return Mono.just(tokenType + " " + accessToken);
+        token.updateToken(tokenType + " " + accessToken);
     }
 }

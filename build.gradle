@@ -3,6 +3,7 @@ plugins {
     id 'idea'
     id "io.spring.dependency-management" version "1.0.11.RELEASE"
     id "org.springframework.boot" version "2.5.1"
+    id "com.google.protobuf" version "0.8.12"
 }
 
 group 'org.example'
@@ -18,6 +19,28 @@ dependencyManagement {
         mavenBom 'io.netty:netty-bom:4.1.65.Final'
         mavenBom 'com.linecorp.armeria:armeria-bom:1.11.0'
         mavenBom 'org.junit:junit-bom:5.7.2'
+    }
+}
+
+protobuf {
+    // Configure the protoc executable.
+    protoc {
+        // Download from the repository.
+        artifact = 'com.google.protobuf:protoc:3.12.0'
+    }
+
+    // Locate the codegen plugins.
+    plugins {
+        // Locate a plugin with name 'grpc'.
+        grpc {
+            // Download from the repository.
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.36.1'
+        }
+    }
+    generateProtoTasks {
+        ofSourceSet('main')*.plugins {
+            grpc {}
+        }
     }
 }
 
@@ -42,6 +65,8 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:2.5.1'
 
     runtimeOnly 'com.linecorp.armeria:armeria-spring-boot2-actuator-starter'
+
+    implementation 'com.linecorp.armeria:armeria-grpc'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'

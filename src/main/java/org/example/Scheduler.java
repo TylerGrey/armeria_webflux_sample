@@ -11,13 +11,7 @@ import reactor.netty.http.client.HttpClient;
 
 @Component
 public class Scheduler {
-
     Logger logger = LoggerFactory.getLogger(Scheduler.class);
-    private final Token token;
-
-    public Scheduler(Token token) {
-        this.token = token;
-    }
 
     @Scheduled(fixedDelay = 2000)
     public void updateAccessToken() {
@@ -31,16 +25,12 @@ public class Scheduler {
                     httpHeaders.add("client_secret", "11232399403");
                 })
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(Void.class)
                 .onErrorResume(throwable -> {
                     logger.error("err : {}", throwable.getMessage());
                     return Mono.empty();
                 })
                 .retry(3)
-                .subscribe(s -> {
-                    if (!s.isEmpty()) {
-                        token.updateToken(s);
-                    }
-                });
+                .subscribe();
     }
 }

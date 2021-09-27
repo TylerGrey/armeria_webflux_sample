@@ -1,10 +1,14 @@
 package org.example;
 
+import com.linecorp.armeria.common.grpc.GrpcSerializationFormats;
+import com.linecorp.armeria.server.HttpServiceWithRoutes;
 import com.linecorp.armeria.server.Server;
 import com.linecorp.armeria.server.docs.DocService;
+import com.linecorp.armeria.server.grpc.GrpcService;
 import com.linecorp.armeria.server.logging.AccessLogWriter;
 import com.linecorp.armeria.server.logging.LoggingService;
 import com.linecorp.armeria.spring.ArmeriaServerConfigurator;
+import io.grpc.protobuf.services.ProtoReflectionService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,6 +39,18 @@ public class ApplicationConfiguration {
             // builder.annotatedService("/rest", service);
             // builder.service("/thrift", THttpService.of(...));
             // builder.service(GrpcService.builder()...build());
+            HttpServiceWithRoutes grpcService =
+                    GrpcService.builder()
+                            .addService(new HelloServiceImpl())
+                            // See https://github.com/grpc/grpc-java/blob/master/documentation/server-reflection-tutorial.md
+                            .addService(ProtoReflectionService.newInstance())
+                            .supportedSerializationFormats(GrpcSerializationFormats.values())
+                            .enableUnframedRequests(true)
+                            // You can set useBlockingTaskExecutor(true) in order to execute all gRPC
+                            // methods in the blockingTaskExecutor thread pool.
+                            // .useBlockingTaskExecutor(true)
+                            .build();
+            builder.service(grpcService);
         };
     }
 }
