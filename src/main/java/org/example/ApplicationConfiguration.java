@@ -9,11 +9,15 @@ import com.linecorp.armeria.server.logging.AccessLogWriter;
 import com.linecorp.armeria.server.logging.LoggingService;
 import com.linecorp.armeria.spring.ArmeriaServerConfigurator;
 import io.grpc.protobuf.services.ProtoReflectionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class ApplicationConfiguration {
+
+    private final HelloServiceImpl helloService;
 
     /**
      * A user can configure a {@link Server} by providing an {@link ArmeriaServerConfigurator} bean.
@@ -41,7 +45,7 @@ public class ApplicationConfiguration {
             // builder.service(GrpcService.builder()...build());
             HttpServiceWithRoutes grpcService =
                     GrpcService.builder()
-                            .addService(new HelloServiceImpl())
+                            .addService(helloService)
                             // See https://github.com/grpc/grpc-java/blob/master/documentation/server-reflection-tutorial.md
                             .addService(ProtoReflectionService.newInstance())
                             .supportedSerializationFormats(GrpcSerializationFormats.values())
